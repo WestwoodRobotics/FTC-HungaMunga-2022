@@ -39,7 +39,7 @@ public class HMAuton extends LinearOpMode {
             frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+            // lol
             waitForStart();
             runtime.reset();
             AutonFunction functions = new AutonFunction(frontLeft, frontRight, backLeft, backRight, runtime);
