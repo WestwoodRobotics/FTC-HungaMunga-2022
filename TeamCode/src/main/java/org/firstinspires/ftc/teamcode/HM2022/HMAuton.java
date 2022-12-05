@@ -17,12 +17,6 @@ public class HMAuton extends LinearOpMode {
             backRight = null;
     Servo claw = null;
 
-    // Motor Power initialization
-    double frontRightPower,
-            frontLeftPower,
-            backRightPower,
-            backLeftPower;
-
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -47,9 +41,7 @@ public class HMAuton extends LinearOpMode {
         runtime.reset();
         AutonFunction functions = new AutonFunction(frontLeft, frontRight, backLeft, backRight, claw, runtime);
         while (opModeIsActive()) {
-            functions.turnLeft(90);
             functions.goForward(36);
-            functions.turnRight(90);
         }
 
     }
