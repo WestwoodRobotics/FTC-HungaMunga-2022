@@ -19,8 +19,7 @@ public class HMTeleOp extends OpMode {
     DcMotor frontLeft,
             frontRight,
             backLeft,
-            backRight,
-            liftMotor = null;
+            backRight = null;
 
     // Viper Motors
     DcMotor viperSlide = null;

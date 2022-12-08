@@ -26,7 +26,6 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -37,12 +36,11 @@ import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "HMAuton")
-public class HMAuton extends LinearOpMode
+@Autonomous(name = "HMAutonBlue")
+public class HMAutonBlue extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -89,9 +87,6 @@ public class HMAuton extends LinearOpMode
 
         viperSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        int targetPos = 0;
-        int height = 0;
-
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -116,11 +111,17 @@ public class HMAuton extends LinearOpMode
          */
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
+        Trajectory leftTrajectorypt0 = drive.trajectoryBuilder(new Pose2d())
+                .strafeRight(33)
+                .build();
+        Trajectory leftTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(33)
+                .build();
         Trajectory leftTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
                 .forward(45)
                 .build();
         Trajectory leftTrajectorypt3 = drive.trajectoryBuilder(new Pose2d())
-                .back(18)
+                .back(22)
                 .build();
         Trajectory leftTrajectorypt4 = drive.trajectoryBuilder(new Pose2d())
                 .strafeLeft(36)
@@ -130,6 +131,12 @@ public class HMAuton extends LinearOpMode
                 .forward(30)
                 .build();
 
+        Trajectory rightTrajectorypt0 = drive.trajectoryBuilder(new Pose2d())
+                .strafeRight(33)
+                .build();
+        Trajectory rightTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(33)
+                .build();
         Trajectory rightTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
                 .forward(45)
                 .build();
@@ -270,12 +277,18 @@ public class HMAuton extends LinearOpMode
 //            drive.followTrajectory(leftTrajectoryScoreHpt1);
 //            drive.followTrajectory(leftTrajectoryScoreHpt2);
 //            drive.followTrajectory(leftTrajectoryScoreHpt3);
+            drive.followTrajectory(leftTrajectorypt0);
+            drive.followTrajectory(leftTrajectorypt1);
             drive.followTrajectory(leftTrajectorypt2);
             drive.followTrajectory(leftTrajectorypt3);
             drive.followTrajectory(leftTrajectorypt4);
         } else if (tagOfInterest.id == MIDDLE) {
+            drive.followTrajectory(rightTrajectorypt0);
+            drive.followTrajectory(rightTrajectorypt1);
             drive.followTrajectory(middleTrajectorypt1);
         } else {
+            drive.followTrajectory(rightTrajectorypt0);
+            drive.followTrajectory(rightTrajectorypt1);
             drive.followTrajectory(rightTrajectorypt2);
             drive.followTrajectory(rightTrajectorypt3);
             drive.followTrajectory(rightTrajectorypt4);
