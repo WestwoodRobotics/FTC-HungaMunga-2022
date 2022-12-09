@@ -1,4 +1,3 @@
-package org.firstinspires.ftc.teamcode.Autonomous.RoadRunnerAutons;
 
 /*
  * Copyright (c) 2021 OpenFTC Team
@@ -41,13 +40,15 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "HMAuton")
-public class HMAuton extends LinearOpMode
+@Autonomous(name = "HighAttempt")
+public class HighAttempt extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
     static final double FEET_PER_METER = 3.28084;
+
+    String parking = "middle";
 
     Servo claw = null;
 
@@ -113,48 +114,12 @@ public class HMAuton extends LinearOpMode
          */
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Trajectory leftTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
-                .forward(45)
-                .build();
-        Trajectory leftTrajectorypt3 = drive.trajectoryBuilder(new Pose2d())
-                .back(18)
-                .build();
-        Trajectory leftTrajectorypt4 = drive.trajectoryBuilder(new Pose2d())
+        Trajectory leftTrajectory = drive.trajectoryBuilder(new Pose2d())
                 .strafeLeft(36)
                 .build();
 
-        Trajectory middleTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
-                .forward(30)
-                .build();
-
-        Trajectory rightTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
-                .forward(45)
-                .build();
-        Trajectory rightTrajectorypt3 = drive.trajectoryBuilder(new Pose2d())
-                .back(18)
-                .build();
-        Trajectory rightTrajectorypt4 = drive.trajectoryBuilder(new Pose2d())
+        Trajectory rightTrajectory = drive.trajectoryBuilder(new Pose2d())
                 .strafeRight(36)
-                .build();
-
-        Trajectory leftTrajectoryScoreHpt1 = drive.trajectoryBuilder(new Pose2d(-36, -65.5), Math.toRadians(90))
-                .splineTo(new Vector2d(-36, 0), Math.toRadians(0))
-                .build();
-        Trajectory leftTrajectoryScoreHpt2 = drive.trajectoryBuilder(leftTrajectoryScoreHpt1.end())
-                .splineTo(new Vector2d(-36, -36), Math.toRadians(90))
-                .build();
-        Trajectory leftTrajectoryScoreHpt3 = drive.trajectoryBuilder(leftTrajectoryScoreHpt2.end())
-                .strafeLeft(24)
-                .build();
-
-        Trajectory rightTrajectoryScoreHpt1 = drive.trajectoryBuilder(new Pose2d(36, -65.5), Math.toRadians(90))
-                .splineTo(new Vector2d(36, 0), Math.toRadians(180))
-                .build();
-        Trajectory rightTrajectoryScoreHpt2 = drive.trajectoryBuilder(leftTrajectoryScoreHpt1.end())
-                .splineTo(new Vector2d(-36, -36), Math.toRadians(90))
-                .build();
-        Trajectory rightTrajectoryScoreHpt3 = drive.trajectoryBuilder(leftTrajectoryScoreHpt2.end())
-                .strafeRight(24)
                 .build();
 
         Trajectory toHigh = drive.trajectoryBuilder(new Pose2d(36, -65.5), Math.toRadians(0))
@@ -173,13 +138,17 @@ public class HMAuton extends LinearOpMode
                 .forward(5)
                 .build();
 
-        Trajectory backToStack = drive.trajectoryBuilder(actuallyToHigh.end())
+        Trajectory backFromActuallyToHigh = drive.trajectoryBuilder(actuallyToHigh.end())
+                .back(5)
+                .build();
+
+        Trajectory backToStack = drive.trajectoryBuilder(backFromActuallyToHigh.end())
                 .splineTo(new Vector2d(-60, -15), Math.toRadians(180))
                 .build();
 
 
 
-        Trajectory parkingPosition = drive.trajectoryBuilder(toHigh.end())
+        Trajectory parkingPosition = drive.trajectoryBuilder(backFromActuallyToHigh.end())
                 .splineTo(new Vector2d(-36, -36), Math.toRadians(90))
                 .build();
 
@@ -260,22 +229,183 @@ public class HMAuton extends LinearOpMode
             telemetry.update();
         }
 
-        claw.setPosition(1);
-//        viperSlide.goTo(100);
         /* Actually do something useful */
         if(tagOfInterest == null || tagOfInterest.id == LEFT) {
-//            drive.followTrajectory(leftTrajectoryScoreHpt1);
-//            drive.followTrajectory(leftTrajectoryScoreHpt2);
-//            drive.followTrajectory(leftTrajectoryScoreHpt3);
-            drive.followTrajectory(leftTrajectorypt2);
-            drive.followTrajectory(leftTrajectorypt3);
-            drive.followTrajectory(leftTrajectorypt4);
+            parking = "Left";
         } else if (tagOfInterest.id == MIDDLE) {
-            drive.followTrajectory(middleTrajectorypt1);
+            parking = "Middle";
         } else {
-            drive.followTrajectory(rightTrajectorypt2);
-            drive.followTrajectory(rightTrajectorypt3);
-            drive.followTrajectory(rightTrajectorypt4);
+            parking = "Right";
+        }
+
+        /* picking up pre-placed cone */
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(60);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        drive.followTrajectory(toHigh);
+        viperSlide.setPower(0);
+
+        /* move to high goal and attempt to score */
+        drive.followTrajectory(actuallyToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(2800);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+
+        /* return to cone stack and pick up 5th cone */
+        drive.followTrajectory(backFromActuallyToHigh);
+        viperSlide.setTargetPosition(690);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        sleep(1800);
+        viperSlide.setPower(0);
+        drive.followTrajectory(backToStack);
+        viperSlide.setTargetPosition(640);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(770);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(600);
+        viperSlide.setPower(0);
+
+        /* drive to high pole and attempt to score */
+        drive.followTrajectory(fromStackToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(3500);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+
+        /* return to cone stack and pick up 4th cone */
+        drive.followTrajectory(backFromActuallyToHigh);
+        viperSlide.setTargetPosition(500);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        sleep(2000);
+        viperSlide.setPower(0);
+        drive.followTrajectory(backToStack);
+        viperSlide.setTargetPosition(440);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(600);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(600);
+        viperSlide.setPower(0);
+
+        /* drive to high pole and attempt to score */
+        drive.followTrajectory(fromStackToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(3500);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+        drive.followTrajectory(backFromActuallyToHigh);
+
+        /* return to cone stack and pick up 3rd cone */
+        drive.followTrajectory(backFromActuallyToHigh);
+        viperSlide.setTargetPosition(400);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        sleep(2000);
+        viperSlide.setPower(0);
+        drive.followTrajectory(backToStack);
+        viperSlide.setTargetPosition(320);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(450);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(600);
+        viperSlide.setPower(0);
+
+        /* drive to high pole and attempt to score */
+        drive.followTrajectory(fromStackToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(3500);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+        drive.followTrajectory(backFromActuallyToHigh);
+
+        /* return to cone stack and pick up 2nd cone */
+        drive.followTrajectory(backFromActuallyToHigh);
+        viperSlide.setTargetPosition(250);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        sleep(2000);
+        viperSlide.setPower(0);
+        drive.followTrajectory(backToStack);
+        viperSlide.setTargetPosition(190);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(300);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(600);
+        viperSlide.setPower(0);
+
+        /* drive to high pole and attempt to score */
+        drive.followTrajectory(fromStackToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(3500);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+        drive.followTrajectory(backFromActuallyToHigh);
+
+        /* return to cone stack and pick up last cone */
+        drive.followTrajectory(backFromActuallyToHigh);
+        viperSlide.setTargetPosition(50);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        sleep(2000);
+        viperSlide.setPower(0);
+        drive.followTrajectory(backToStack);
+        viperSlide.setTargetPosition(10);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(-1);
+        claw.setPosition(1);
+        viperSlide.setTargetPosition(60);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(300);
+        viperSlide.setPower(0);
+
+        /* drive to high pole and attempt to score */
+        drive.followTrajectory(fromStackToHigh);
+        viperSlide.setTargetPosition(3120);
+        viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        viperSlide.setPower(1);
+        sleep(3500);
+        viperSlide.setPower(0);
+        drive.followTrajectory(actuallyToHigh);
+        claw.setPosition(0.7);
+        drive.followTrajectory(backFromActuallyToHigh);
+
+        /* return to center of parking positions */
+        drive.followTrajectory(parkingPosition);
+        if (parking == "Left") {
+            drive.followTrajectory(leftTrajectory);
+        } else if (parking == "Right") {
+            drive.followTrajectory(rightTrajectory);
         }
 
 
