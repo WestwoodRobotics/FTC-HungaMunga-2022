@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.RoadRunnerAutons;
+package org.firstinspires.ftc.teamcode.HM2022;
 
 /*
  * Copyright (c) 2021 OpenFTC Team
@@ -86,6 +86,9 @@ public class HMAutonBlue extends LinearOpMode
         viperSlide.setMode(DcMotor.RunMode.RESET_ENCODERS);
 
         viperSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        int targetPos = 0;
+        int height = 0;
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()

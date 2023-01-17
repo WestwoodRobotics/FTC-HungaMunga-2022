@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.RoadRunnerAutons;
+package org.firstinspires.ftc.teamcode.HM2022;
 
 /*
  * Copyright (c) 2021 OpenFTC Team
@@ -41,7 +41,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "HMAuton")
+@Autonomous(name = "HungaMungaAuton20pts")
 public class HMAuton extends LinearOpMode
 {
     OpenCvCamera camera;
@@ -88,6 +88,9 @@ public class HMAuton extends LinearOpMode
         viperSlide.setMode(DcMotor.RunMode.RESET_ENCODERS);
 
         viperSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        int targetPos = 0;
+        int height = 0;
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -157,31 +160,31 @@ public class HMAuton extends LinearOpMode
                 .strafeRight(24)
                 .build();
 
-        Trajectory toHigh = drive.trajectoryBuilder(new Pose2d(36, -65.5), Math.toRadians(0))
-                .splineTo(new Vector2d(-34, 1), Math.toRadians(0))
+
+
+
+        Trajectory toHigh = drive.trajectoryBuilder(new Pose2d(-36, -65.5), Math.toRadians(90))
+                .splineTo(new Vector2d(-36, 0), Math.toRadians(0))
                 .build();
-
-        Trajectory toStack = drive.trajectoryBuilder(toHigh.end())
-                .splineTo(new Vector2d(-60, -15), Math.toRadians(180))
-                .build();
-
-        Trajectory fromStackToHigh = drive.trajectoryBuilder(toStack.end())
-                .splineTo(new Vector2d(-34, 1), Math.toRadians(0))
-                .build();
-
-        Trajectory actuallyToHigh = drive.trajectoryBuilder(fromStackToHigh.end())
-                .forward(5)
-                .build();
-
-        Trajectory backToStack = drive.trajectoryBuilder(actuallyToHigh.end())
-                .splineTo(new Vector2d(-60, -15), Math.toRadians(180))
-                .build();
-
-
 
         Trajectory parkingPosition = drive.trajectoryBuilder(toHigh.end())
                 .splineTo(new Vector2d(-36, -36), Math.toRadians(90))
                 .build();
+
+//        public void goTo(int ticks) {
+//            targetPos = ticks;
+//            height = viperSlide.getCurrentPosition();
+//
+//            viperSlide.setTargetPosition(targetPos);
+//
+//            if (height < targetPos) {
+//                viperSlide.setPower(1);
+//            } else if (height > targetPos) {
+//                viperSlide.setPower(-1);
+//            } else if (height == targetPos) {
+//                viperSlide.setPower(0);
+//            }
+//    }
 
         while (!isStarted() && !isStopRequested())
         {

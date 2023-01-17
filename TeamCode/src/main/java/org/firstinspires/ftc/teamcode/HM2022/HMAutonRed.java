@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.RoadRunnerAutons;
+package org.firstinspires.ftc.teamcode.HM2022;
 
 /*
  * Copyright (c) 2021 OpenFTC Team
@@ -89,6 +89,9 @@ public class HMAutonRed extends LinearOpMode
 
         viperSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        int targetPos = 0;
+        int height = 0;
+
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -114,39 +117,39 @@ public class HMAutonRed extends LinearOpMode
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         Trajectory leftTrajectorypt0 = drive.trajectoryBuilder(new Pose2d())
-                .strafeLeft(33)
-                .build();
-        Trajectory leftTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
                 .strafeRight(33)
                 .build();
+        Trajectory leftTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(33)
+                .build();
         Trajectory leftTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
-                .forward(45)
+                .back(45)
                 .build();
         Trajectory leftTrajectorypt3 = drive.trajectoryBuilder(new Pose2d())
-                .back(22)
+                .forward(22)
                 .build();
         Trajectory leftTrajectorypt4 = drive.trajectoryBuilder(new Pose2d())
-                .strafeLeft(36)
+                .strafeRight(36)
                 .build();
 
         Trajectory middleTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
-                .forward(30)
+                .back(30)
                 .build();
 
         Trajectory rightTrajectorypt0 = drive.trajectoryBuilder(new Pose2d())
-                .strafeLeft(33)
-                .build();
-        Trajectory rightTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
                 .strafeRight(33)
                 .build();
+        Trajectory rightTrajectorypt1 = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(33)
+                .build();
         Trajectory rightTrajectorypt2 = drive.trajectoryBuilder(new Pose2d())
-                .forward(45)
+                .back(45)
                 .build();
         Trajectory rightTrajectorypt3 = drive.trajectoryBuilder(new Pose2d())
-                .back(18)
+                .forward(18)
                 .build();
         Trajectory rightTrajectorypt4 = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(36)
+                .strafeLeft(36)
                 .build();
 
         Trajectory leftTrajectoryScoreHpt1 = drive.trajectoryBuilder(new Pose2d(-36, -65.5), Math.toRadians(90))
